@@ -8,6 +8,8 @@ on:
         required: false
         default: 'Manual execution'
 
+permissions: write-all
+
 jobs:
   run-requete:
     runs-on: ubuntu-latest
