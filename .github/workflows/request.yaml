@@ -1,0 +1,50 @@
+name: Query the News API
+
+on:
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+    inputs:
+      reason:
+        description: 'Reason for running this workflow'
+        required: false
+        default: 'Manual execution'
+
+jobs:
+  run-requete:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: '4.4.1'
+        
+    - name: Setup R dependencies
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        cache-version: 2
+        extra-packages: |
+          any::httr2
+          any::usethis
+          
+    - name: Create data directory
+      run: mkdir -p data
+      
+    - name: Run requete.R script
+      run: Rscript requete.R
+      env:
+        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        
+    - name: Commit and push results
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update data from requete.R - $(date)"
+          git push
+        fi
