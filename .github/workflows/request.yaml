@@ -37,14 +37,5 @@ jobs:
       env:
         NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
         
-    - name: Commit and push results
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add data/
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "Update data from requete.R - $(date)"
-          git push
-        fi
+    # Commit the changes back to this repo
+    - uses: stefanzweifel/git-auto-commit-action@v5
